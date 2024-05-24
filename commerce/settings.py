@@ -118,6 +118,7 @@ USE_L10N = True
 
 USE_TZ = True
 
+CSRF_COOKIE_SECURE = True  # Set to True if served over HTTPS, otherwise False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
