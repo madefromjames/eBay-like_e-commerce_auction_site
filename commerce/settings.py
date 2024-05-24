@@ -25,7 +25,7 @@ SECRET_KEY = '6ps8j!crjgrxt34cqbqn7x&b3y%(fny8k8nh21+qa)%ws3fh!q'
 CSRF_COOKIE_SECURE = True  # Set to True if served over HTTPS, otherwise False
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # Set the default auto field for all models
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
