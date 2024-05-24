@@ -28,7 +28,7 @@ DEBUG = True
 # Set the default auto field for all models
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['commerce1.azurewebsites.net', 'www.commerce1.azurewebsites.net']
 
 
 # Application definition
