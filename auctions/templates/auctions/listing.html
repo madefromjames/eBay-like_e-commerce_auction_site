@@ -1,0 +1,116 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+<div class="container">
+    {% if message %}
+        {% if updated %}
+            <div class="alert alert-success" role="alert">
+                {{ message }}
+            </div>
+        {% else %}
+            <div class="alert alert-danger" role="alert">
+                {{ message }}
+            </div>
+        {% endif %}
+    {% endif %}
+</div>
+
+{% if not listing.isActive and user == highest_bid_user %}
+    <div class="alert alert-success" role="alert">
+        Congratulations! You won the Auction.
+    </div>
+{% endif %}
+
+
+<div class="row mx-3 mb-3">
+    {% if user.is_authenticated and listing.isActive %}
+        {% if owner %}
+            <form action="{% url 'closeAuction' id=listing.id %}" class="mr-3">
+                {% csrf_token %}
+                <button class="btn btn-warning btn-sm">Close Auction</button>
+            </form>
+        {% endif %}
+        {% if listingWatchlist %}
+            <form action="{% url 'removeWatchist' id=listing.id %}">
+                {% csrf_token %}
+                <button class="btn btn-danger btn-sm">Remove Watchlist</button>
+            </form>
+        {% else %}
+            <form action="{% url 'addWatchist' id=listing.id %}">
+                {% csrf_token %}
+                <button class="btn btn-success btn-sm">Add Watchlist</button>
+            </form>
+        {% endif  %}
+    {% endif  %}
+</div>
+
+<div class="container-fluid">
+    <h3>Listing: {{ listing.title }}</h3>
+    {% if listingWatchlist %}
+        <img alt="Static Badge" class="mb-2" src="https://img.shields.io/badge/Watchlist-grey">
+    {% endif %} <br>
+    <div class="card mb-3" style="max-width: 540px;">
+        <div class="row g-0">
+          <div class="col-md-4">
+            <img src="{{ listing.imageUrl }}" class="img-fluid rounded-start" alt="{{ listing.title }}">
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <p class="card-text">{{ listing.description }}</p>
+              <p class="card-text"><small class="text-muted">{{ listing.listed_at }}</small></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% if listing.isActive and user == highest_bid_user %}
+        <p>{{ countBid }} bid(s) so far. Your bid is the current bid.</p>
+    {% else %}
+        <p>{{ countBid }} bid(s) so far</p>
+    {% endif %}
+    <h4>${{ listing.price }}</h4>
+</div>
+
+{% if listing.isActive %}
+    <div class="form-group">
+        <form action="{% url 'addBid' id=listing.id %}" method="post">
+            {% csrf_token %}
+            <input type="number" name="bid" class="form-control" id="bids" placeholder="Bid" step="0.01">
+            <button class="btn btn-primary mt-3">Place Bid</button>
+        </form>
+    </div>
+{% else %}
+
+{% endif %}
+
+<h4>Details</h4>
+<ul>
+<li>Listed by {{ listing.owner.username }}</li>
+{% if listing.category %}
+    <li>Category: {{ listing.category }}</li>
+    {% else %}
+    <li>Category: No Category Listed</li>
+    {% endif %}
+</ul>
+
+<h4>Comment</h4>
+{% if user.is_authenticated %}
+    <div class="form-group">
+        <form action="{% url 'comment' id=listing.id %}" method="post">
+            {% csrf_token %}
+            <input type="text" name="comment" class="form-control" placeholder="Add Comment" maxlength="100">
+            <button class="btn btn-primary btn mt-3">Submit</button>
+        </form>
+    </div>
+{% endif %}
+
+{% for comment in allComment %}
+    <figure>
+        <figcaption class="blockquote-footer">
+        {{comment.author}};<cite title="Source Title"> {{ comment.created_at }}</cite>
+        </figcaption>
+        <p>{{ comment.message }}</p><hr>
+    </figure>
+{% endfor %}
+    
+{% endblock %}
