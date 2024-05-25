@@ -17,7 +17,7 @@ This project is an eBay-like e-commerce auction site developed using Django, all
 
 #### Live Demo
 
-- Visit <a href="https://commerce1.azurewebsites.net/" target="_blank">**e-commerce**</a> in your browser to view the site.
+- Visit <a href="https://commerce1.azurewebsites.net/" target="_blank"><b>e-commerce</b></a> in your browser to view the site.
 
 #### Installation (Optional)
 
