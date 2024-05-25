@@ -7,7 +7,7 @@ from django.urls import reverse
 from .models import User, Category, Listing, Bid, Comment
 
 def index(request):
-    activeListing = Listing.objects.filter(isActive=True)
+    activeListing = Listing.objects.filter(isActive=True).order_by('-listed_at')
     watchlistCount = 0
 
     if request.user.is_authenticated:

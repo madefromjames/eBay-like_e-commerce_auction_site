@@ -44,4 +44,4 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
-        return f"{str(self.author)} comment on {str(self.listing)}"
+        return f"Comment by {str(self.author)} on {str(self.listing)} - {self.message}"
