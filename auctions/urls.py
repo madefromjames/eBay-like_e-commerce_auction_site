@@ -1,5 +1,3 @@
-from django.conf import settings
-from django.conf.urls.static import static
 from django.urls import path
 
 from . import views
@@ -18,4 +16,4 @@ urlpatterns = [
     path("watchlist", views.watchlist, name="watchlist"),
     path("addBid/<int:id>", views.addBid, name="addBid"),
     path("closeAuction/<int:id>", views.closeAuction, name="closeAuction")
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+]
