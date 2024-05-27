@@ -3,30 +3,38 @@
 {% block body %}
     <h2>Create Listings</h2>
 
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            {% for field, error in form.errors.items %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
     <form action="{% url 'create' %}" method="POST">
         {% csrf_token %}
         <div class="form-group">
-            <label for="Title">Title</label>
-            <input type="text" name="title" class="form-control" id="title" placeholder="Title">
+            <label for="form.title.label">{{ form.title.label }}</label>
+            {{ form.title }}
         </div>
         <div class="form-group">
-            <label for="Description">Description</label>
-            <input type="text" name="description" class="form-control" id="description" placeholder="Description">
+            <label for="form.title.label">{{ form.description.label }}</label>
+            {{ form.description }}
         </div>
         <div class="form-group">
-            <label for="imageURL">Image URL</label>
-            <input type="text" name="imageURL" class="form-control" id="image" placeholder="Image URL">
+            <label for="form.title.label">{{ form.imageUrl.label }}</label>
+            {{ form.imageUrl }}
         </div>
         <div class="form-group">
-            <label for="Price">Price</label>
-            <input type="number" min="0" name="price" class="form-control" id="price" placeholder="Price" step="0.01">
+            <label for="form.title.label">{{ form.price.label }}</label>
+            {{ form.price }}
         </div>
-        <label for="Category">Choose a category</label>
         <div class="form-group">
+            <label for="form.category.label">Choose a category</label>
             <select name="category" class="custom-select">
                 <option value="" selected>Select or suggest a category (recommended but optional)</option>
-                {% for cat in category %}
-                <option value="{{ cat }}">{{ cat }}</option>
+                {% for category in categorys %}
+                    <option value="{{ category }}">{{ category }}</option>
                 {% endfor %}
             </select>
         </div>

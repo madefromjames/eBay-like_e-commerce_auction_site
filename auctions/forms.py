@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from .models import Listing
 
 User = get_user_model()
 
@@ -44,4 +45,35 @@ class LoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput(attrs={
         'class': 'form-control', 'placeholder': 'Password'
     }))
-    
+
+class ListingForm(forms.ModelForm):
+    class Meta:
+        model = Listing
+        fields = ['title', 'description', 'imageUrl', 'price']
+        widgets = {
+            'title': forms.TextInput(attrs={
+                'class': 'form-control', 'placeholder': 'Title'
+            }),
+            'description': forms.TextInput(attrs={
+                'class': 'form-control', 'placeholder': 'Description'
+            }),
+            'imageUrl': forms.TextInput(attrs={
+                'class': 'form-control', 'placeholder': 'Image URL'
+            }),
+            'price': forms.NumberInput(attrs={
+                'class': 'form-control', 'placeholder': 'Price', 'step': '0.01'
+            }),
+        }
+        error_messages = {
+            'title': {
+                'required': 'Title is required.',
+                'max_length': 'Title must be less than 100 characters.'
+            },
+            'description': {
+                'required': 'Description is required.',
+            },
+            'price': {
+                'required': 'Price is required.',
+                'invalid': 'Enter a valid price.'
+            },
+        }

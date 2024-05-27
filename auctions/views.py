@@ -3,7 +3,7 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from .forms import RegistrationForm, LoginForm
+from .forms import RegistrationForm, LoginForm, ListingForm
 
 from .models import Category, Listing, Bid, Comment
 
@@ -45,7 +45,7 @@ def categories(request):
     else:
         watchlistCount = request.user.watchlist.all().count()
         allCategories = Category.objects.all()
-        activeListing = Listing.objects.filter(isActive=True)
+        activeListing = Listing.objects.filter(isActive=True).order_by('-listed_at')
         return render(request, "auctions/categories.html", {
             "categories": allCategories, "listings": activeListing,
             "watchlistCount": watchlistCount
@@ -120,7 +120,7 @@ def addWatchlist(request, id):
     return HttpResponseRedirect(reverse("listing", args=(id, )))
 
 def watchlist(request):
-    watchlist = request.user.watchlist.all()
+    watchlist = request.user.watchlist.all().order_by('-listed_at')
     watchlistCount = watchlist.count()
     return render(request, "auctions/watchlist.html", {
         "watchlist": watchlist, "watchlistCount": watchlistCount
@@ -142,46 +142,60 @@ def create_list(request):
     if request.method == "GET":
         categorys = Category.objects.all()
         watchlistCount = request.user.watchlist.all().count()
+        form = ListingForm()
         return render(request, "auctions/create.html", {
-            "category": categorys, "watchlistCount": watchlistCount
+            "categorys": categorys, "watchlistCount": watchlistCount,
+            "form": form
         })
     else:
         # Get the form data
-        title = request.POST['title']
-        description = request.POST['description']
-        image = request.POST['imageURL']
-        price = request.POST['price']
-        category = request.POST['category']
+        form = ListingForm(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data.get('title')
+            description = form.cleaned_data.get('description')
+            image = form.cleaned_data.get('imageUrl')
+            price = form.cleaned_data.get('price')
+            category = request.POST.get('category')
 
-        # Current User
-        currentUser = request.user
+            # Current User
+            currentUser = request.user
 
-        # Get the particuar category
-        categoryData = None
-        if category:
-            try:
-                # Get the particular category
-                categoryData = Category.objects.get(categoryName=category)
-            except Category.DoesNotExist:
-                # If category does not exist, set categoryData to None and continue
-                categoryData = None
+            # Get the particuar category
+            categoryData = None
+            if category:
+                try:
+                    # Get the particular category
+                    categoryData = Category.objects.get(categoryName=category)
+                except Category.DoesNotExist:
+                    # If category does not exist, set categoryData to None and continue
+                    categoryData = None
 
-        # Create a new list object
-        newList = Listing(title=title,
-                          description=description,
-                          imageUrl=image,
-                          price=float(price),
-                          owner=currentUser,
-                          category=categoryData)
+            # Create a new list object
+            newList = Listing(title=title,
+                            description=description,
+                            imageUrl=image,
+                            price=float(price),
+                            owner=currentUser,
+                            category=categoryData)
 
-        # Insert newList into databse
-        newList.save()
+            # Insert newList into databse
+            newList.save()
 
-        # Create Bid object
-        bid = Bid(listing=newList, user=currentUser, bid=price)
-        bid.save()
+            # Create Bid object
+            bid = Bid(listing=newList, user=currentUser, bid=price)
+            bid.save()
 
-        return HttpResponseRedirect(reverse(index))
+            return HttpResponseRedirect(reverse(index))
+        else:
+            categorys = Category.objects.all()
+            watchlistCount = request.user.watchlist.all().count()
+
+            return render(request, "auctions/create.html", {
+                'form': form, "categorys": categorys,
+                "watchlistCount": watchlistCount
+            })
+
+        
 
 
 def login_view(request):
