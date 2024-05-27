@@ -18,7 +18,10 @@ class RegistrationForm(forms.ModelForm):
             }),
             'email': forms.EmailInput(attrs={
                 'class': 'form-control', 'placeholder': 'Email'
-            })
+            }),
+        }
+        help_texts = {
+            'username': 'None'
         }
 
     def cleaned_data(self):
