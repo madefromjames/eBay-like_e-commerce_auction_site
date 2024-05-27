@@ -218,15 +218,11 @@ def register(request):
             password = form.cleaned_data['password']
 
             # Attempt to create new user
-            try:
-                user = User.objects.create_user(username, email, password)
-                user.save()
-                login(request, user)
-                return redirect("index")
-            except IntegrityError:
-                form.add_error('username', 'Username already taken')
-
-            # return HttpResponseRedirect(reverse("index"))
+            user = User.objects.create_user(username, email, password)
+            user.save()
+            login(request, user)
+            return redirect("index")
+            
     else:
         form = RegistrationForm()
         
