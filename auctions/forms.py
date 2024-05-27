@@ -36,4 +36,12 @@ class RegistrationForm(forms.ModelForm):
             raise ValidationError('Passwords do not match')
         
         return cleaned_data
+
+class LoginForm(forms.Form):
+    username = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control', 'placeholder': 'Username'
+    }))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={
+        'class': 'form-control', 'placeholder': 'Password'
+    }))
     

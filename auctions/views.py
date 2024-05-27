@@ -3,7 +3,7 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from .forms import RegistrationForm
+from .forms import RegistrationForm, LoginForm
 
 from .models import Category, Listing, Bid, Comment
 
@@ -186,22 +186,28 @@ def create_list(request):
 
 def login_view(request):
     if request.method == "POST":
+        form = LoginForm(request.POST)
 
         # Attempt to sign user in
-        username = request.POST["username"]
-        password = request.POST["password"]
-        user = authenticate(request, username=username, password=password)
+        if form.is_valid():
+            username = form.cleaned_data.get("username")
+            password = form.cleaned_data.get("password")
+            user = authenticate(request, username=username, password=password)
 
-        # Check if authentication successful
-        if user is not None:
-            login(request, user)
-            return HttpResponseRedirect(reverse("index"))
-        else:
-            return render(request, "auctions/login.html", {
-                "message": "Invalid username and/or password."
-            })
+            # Check if authentication successful
+            if user is not None:
+                login(request, user)
+                return HttpResponseRedirect(reverse("index"))
+            else:
+                return render(request, "auctions/login.html", {
+                    "form": form, "message": "Invalid username and/or password."
+                })
     else:
-        return render(request, "auctions/login.html")
+        form = LoginForm()
+
+    return render(request, "auctions/login.html", {
+        'form': form
+    })
 
 
 def logout_view(request):
