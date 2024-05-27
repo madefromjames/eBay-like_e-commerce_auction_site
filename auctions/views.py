@@ -1,11 +1,13 @@
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from .forms import RegistrationForm
 
-from .models import User, Category, Listing, Bid, Comment
+from .models import Category, Listing, Bid, Comment
+
+User = get_user_model()
 
 def index(request):
     activeListing = Listing.objects.filter(isActive=True).order_by('-listed_at')
@@ -223,6 +225,8 @@ def register(request):
                 return redirect("index")
             except IntegrityError:
                 form.add_error('username', 'Username already taken')
+
+            # return HttpResponseRedirect(reverse("index"))
     else:
         form = RegistrationForm()
         

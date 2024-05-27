@@ -4,14 +4,31 @@
 
     <h2>Register</h2>
 
-    {% if message %}
-        <div>{{ message }}</div>
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            {% for field, error in form.errors.items %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
     {% endif %}
 
     <form action="{% url 'register' %}" method="post">
         {% csrf_token %}
         <div class="form-group">
-            {{ form }}
+            <label for="">{{ form.username.label }}</label>
+            {{ form.username }}
+        </div>
+        <div class="form-group">
+            <label for="">{{ form.email.label }}</label>
+            {{ form.email }}
+        </div>
+        <div class="form-group">
+            <label for="">{{ form.password.label }}</label>
+            {{ form.password }}
+        </div>
+        <div class="form-group">
+            <label for="">{{ form.confirmation.label }}</label>
+            {{ form.confirmation }}
         </div>
         <input class="btn btn-primary" type="submit" value="Register">
     </form>
