@@ -3,7 +3,7 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from .forms import RegistrationForm, LoginForm, ListingForm
+from .forms import RegistrationForm, LoginForm, ListingForm, addBidForm, CommentForm
 
 from .models import Category, Listing, Bid, Comment
 
@@ -26,6 +26,7 @@ def categories(request):
         allCategories = Category.objects.all()
         watchlistCount = request.user.watchlist.all().count()
 
+        activeListing = None
         if categoryForm == "No Category":
              # If "No Category" is selected, filter listings with no category
             activeListing = Listing.objects.filter(category__isnull=True)
@@ -69,33 +70,42 @@ def listing(request, id):
     message = request.session.pop('message', None)
     updated = request.session.pop('updated', None)
 
+    bidform = addBidForm()
+    commentform = CommentForm()
+
     return render(request, "auctions/listing.html", {
         "listing": listing, "listingWatchlist": listingWatchlist,
         "owner": owner, "countBid": countBid,
         "highest_bid_user": highest_bid_user,
         "watchlist": watchlist, "allComment": allComment,
-        "watchlistCount": watchlistCount,
-        "message": message, "updated": updated
+        "watchlistCount": watchlistCount, "bidform": bidform,
+        "message": message, "updated": updated, "commentform": commentform
     })
 
-
 def addBid(request, id):
-    newBid = float(request.POST["bid"])
-    listing = Listing.objects.get(pk=id)
-    if newBid > listing.price:
-        updateBid = Bid(bid=newBid, user=request.user, listing=listing)
-        updateBid.save()
-        listing.price = newBid
-        listing.save()
+    if request.method == "POST":
+        form = addBidForm(request.POST)
+        if form.is_valid():
+            newBid = form.cleaned_data.get('bid')
+            listing = Listing.objects.get(pk=id)
+            if newBid > listing.price:
+                updateBid = Bid(bid=newBid, user=request.user, listing=listing)
+                updateBid.save()
+                listing.price = newBid
+                listing.save()
 
-        request.session['message'] = "Bid updated successfully"
-        request.session['updated'] = True
-    else:
-        # Message to display after redirection
-        request.session['message'] = "Bid must be higher than the current price"
-        request.session['updated'] = False
+                request.session['message'] = "Bid updated successfully"
+                request.session['updated'] = True
+            else:
+                # Message to display after redirection
+                request.session['message'] = "Bid must be higher than the current price"
+                request.session['updated'] = False
+        else:
+            request.session['message'] = "Invalid bid. Please enter a valid amount."
+            request.session['updated'] = False
 
     return HttpResponseRedirect(reverse("listing", args=(id, )))
+    
     
 def closeAuction(request, id):
     listing = Listing.objects.get(pk=id)
@@ -128,12 +138,22 @@ def watchlist(request):
 
 def comment(request, id):
     if request.method == "POST":
-        listing = Listing.objects.get(pk=id)
-        comment = request.POST["comment"]
-        currentUser = request.user
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            listing = Listing.objects.get(pk=id)
+            comment = form.cleaned_data.get("message")
+            currentUser = request.user
 
-        newComment = Comment(author=currentUser, listing=listing, message=comment)
-        newComment.save()
+            newComment = Comment(author=currentUser, listing=listing, message=comment)
+            newComment.save()
+
+            request.session['message'] = "Comment added successfully"
+            request.session['updated'] = True
+        else:
+            for error in form.errors['message']:
+                request.session['message'] = error
+                request.session['updated'] = False
+                break
 
         return HttpResponseRedirect(reverse("listing", args=(id, )))
 
