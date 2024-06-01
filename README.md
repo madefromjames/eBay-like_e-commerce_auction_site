@@ -2,8 +2,8 @@
 
 This project is an eBay-like e-commerce auction site developed using Django, allowing users to post auction listings, place bids on listings, comment on listings, and add listings to a watchlist.
 
-![Active Listing Page](staticfiles\auctions\auction1.png)
-![Listing Page](staticfiles\auctions\auction2.png)
+![Active Listing Page](auction1.png)
+![Listing Page](auction2.png)
 
 ## Features
 
